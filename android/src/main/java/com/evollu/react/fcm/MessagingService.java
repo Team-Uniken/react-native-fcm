@@ -79,7 +79,7 @@ public class MessagingService extends FirebaseMessagingService {
         }
     }
 
-    @Override
+    //@Override
     public void buildLocalNotification(RemoteMessage remoteMessage) {
         if(remoteMessage.getData() == null){
             return;
