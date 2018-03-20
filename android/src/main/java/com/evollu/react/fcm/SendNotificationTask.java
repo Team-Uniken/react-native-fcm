@@ -1,6 +1,8 @@
 package com.evollu.react.fcm;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -40,12 +42,20 @@ public class SendNotificationTask extends AsyncTask<Void, Void, Void> {
     private Bundle bundle;
     private SharedPreferences sharedPreferences;
     private Boolean mIsForeground;
+    static String notificationChannelId;
+    static String notificationChannelName;
     
     SendNotificationTask(Context context, SharedPreferences sharedPreferences, Boolean mIsForeground, Bundle bundle){
         this.mContext = context;
         this.bundle = bundle;
         this.sharedPreferences = sharedPreferences;
         this.mIsForeground = mIsForeground;
+        notificationChannelId  = context.getApplicationContext().getPackageName();
+        notificationChannelName = context.getApplicationInfo().name;
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+            NotificationManager notificationManager= (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(new NotificationChannel(notificationChannelId,notificationChannelName, NotificationManager.IMPORTANCE_HIGH));
+        }
     }
     
     protected Void doInBackground(Void... params) {
@@ -68,7 +78,7 @@ public class SendNotificationTask extends AsyncTask<Void, Void, Void> {
                 title = mContext.getPackageManager().getApplicationLabel(appInfo).toString();
             }
             
-            NotificationCompat.Builder notification = new NotificationCompat.Builder(mContext)
+            NotificationCompat.Builder notification = new NotificationCompat.Builder(mContext,notificationChannelId)
             .setContentTitle(title)
             .setContentText(bundle.getString("body"))
             .setTicker(bundle.getString("ticker"))
@@ -282,4 +292,5 @@ public class SendNotificationTask extends AsyncTask<Void, Void, Void> {
         return launchIntent != null ? launchIntent.getComponent().getClassName() : null;
     }
 }
+
 

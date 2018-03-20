@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.content.pm.ApplicationInfo;
 
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactInstanceManager;
@@ -78,7 +79,32 @@ public class MessagingService extends FirebaseMessagingService {
         }
     }
 
+    @Override
     public void buildLocalNotification(RemoteMessage remoteMessage) {
+        if(remoteMessage.getData() == null){
+            return;
+        }
+        Map<String, String> data = remoteMessage.getData();
+        String message = data.get("message");
+        if(message != null){
+            try {
+                Bundle bundle = BundleJSONConverter.convertToBundle(new JSONObject(remoteMessage.getData()));
+                FIRLocalMessagingHelper helper = new FIRLocalMessagingHelper(this.getApplication());
+                ApplicationInfo appInfo = getApplicationContext().getApplicationInfo();
+                String ticker = getApplicationContext().getPackageManager().getApplicationLabel(appInfo).toString();
+                bundle.putString("body",message);
+                bundle.putString("ticker",ticker);
+                bundle.putString("icon","ic_notification");
+                bundle.putString("hiddenMessage",data.get("hiddenMessage"));
+                helper.sendNotification(bundle);
+            } catch (Exception e) {
+               // e.printStackTrace();
+            }
+
+        }
+    }
+
+   /* public void buildLocalNotification(RemoteMessage remoteMessage) {
         if(remoteMessage.getData() == null){
             return;
         }
@@ -94,5 +120,5 @@ public class MessagingService extends FirebaseMessagingService {
             }
 
         }
-    }
+    }*/
 }
