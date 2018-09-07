@@ -96,6 +96,8 @@ public class MessagingService extends FirebaseMessagingService {
                 bundle.putString("ticker",ticker);
                 bundle.putString("icon","ic_notification");
                 bundle.putString("hiddenMessage",data.get("hiddenMessage"));
+                bundle.putString("priority",data.get("priority"));
+                bundle.putBoolean("wake_screen",Boolean.valueOf(data.get("wake_screen")));
                 helper.sendNotification(bundle);
             } catch (Exception e) {
                // e.printStackTrace();
